@@ -12,3 +12,7 @@ A posting web demo using Rust and actix-web, with my opinionated designing.
 - [ ] Server-side rendering web app.
 - [ ] Client-side rendering using React.
 - [ ] Mobile app?
+
+## Special Thanks
+
+* [Scott Wlaschin](https://scottwlaschin.com/) and [his wonderful book](https://pragprog.com/titles/swdddf/domain-modeling-made-functional/) which inspire me a lot.
