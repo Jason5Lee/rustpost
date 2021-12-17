@@ -1,9 +1,12 @@
+use mysql::params;
 use mysql::prelude::Queryable;
 use structopt::StructOpt;
-use mysql::params;
 
 #[derive(Debug, StructOpt)]
-#[structopt(name = "rustpost-createadmin", about = "CLI for creating admin for rustpost")]
+#[structopt(
+    name = "rustpost-createadmin",
+    about = "CLI for creating admin for rustpost"
+)]
 struct Opt {
     /// URI of rustpost MySQL DB. Can be overriden by MYSQL_URL environment variable.
     #[structopt(long)]
@@ -19,7 +22,8 @@ struct Opt {
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let opt = Opt::from_args();
     let mysql_uri = std::env::var("MYSQL_URI")
-        .ok().or(opt.mysql_uri)
+        .ok()
+        .or(opt.mysql_uri)
         .ok_or("cannot found MySQL URI")?;
 
     let encrypted = bcrypt::hash(opt.password, opt.cost)?;
@@ -30,12 +34,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut id_bytes = [0u8; 8];
     getrandom::getrandom(&mut id_bytes)?;
 
-    conn.exec_drop("INSERT INTO admins (id, bcrypted_password) VALUES (:id, :bcrypted_password)",
+    conn.exec_drop(
+        "INSERT INTO admins (admin_id, bcrypted_password) VALUES (:id, :bcrypted_password)",
         params! {
             "id" => u64::from_le_bytes(id_bytes),
             "bcrypted_password" => encrypted,
-        })?;
-    println!("Admin Id: {}", base64::encode_config(&id_bytes, base64::URL_SAFE_NO_PAD));
+        },
+    )?;
+    println!(
+        "Admin Id: {}",
+        base64::encode_config(&id_bytes, base64::URL_SAFE_NO_PAD)
+    );
     Ok(())
 }
-

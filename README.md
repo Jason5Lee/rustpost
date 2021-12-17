@@ -1,17 +1,15 @@
 # Rustpost
 
-A posting web demo using Rust and actix-web, with my opinionated designing.
+A post service written in Rust.
 
-## Project Dir
+## Projects
 
-* [api](./api) is the RESTful API service.
+* [rustpost REST API](./restapi) is the RESTful API service.
 * [createadmin](./createadmin) is the CLI tool for creating admin.
 
 ## TODO
 
-- [ ] Server-side rendering web app.
-- [ ] Client-side rendering using React.
-- [ ] Mobile app?
+- [ ] Server-side rendering Web app.
 
 ## Special Thanks
 
