@@ -30,6 +30,10 @@ and is considered as the part of the API, while the other errors are just create
 
 ### Value Invalid Design
 
+Note: the invalidation talked about below is only for the failure. If an invalidation is caused by the
+client wrong implementation instead of the user input (for example missing a field), the design below does not
+apply. In that case a `400 Bad Request` will be responded.
+
 The invalid values can be handled differently. Normally we want to respond a `422 Unprocessable Entity`,
 but if the value is from the database we may just log and respond
 internal error, or sometimes if the value is for finding something we may respond a `404 Not Found`.
