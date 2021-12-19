@@ -21,15 +21,13 @@ pub async fn api(mut ctx: utils::Context) -> Result<HttpResponse> {
 
     let req = ctx.to::<BodyJson<RequestDto>>().await?.0;
     let input = Command {
-        info: PostInfo {
-            title: Title::try_new(req.title).map_err(|err| ErrorUnprocessableEntity(err.body))?,
-            content: match (req.post, req.url) {
-                (Some(post), None) => PostContent::Post(post),
-                (None, Some(url)) => {
-                    PostContent::parse_url(url).map_err(|err| ErrorUnprocessableEntity(err.body))?
-                }
-                _ => return Err(ErrorBadRequest("ONLY_EXACT_ONE_OF_POST_URL")),
-            },
+        title: Title::try_new(req.title).map_err(|err| ErrorUnprocessableEntity(err.body))?,
+        content: match (req.post, req.url) {
+            (Some(post), None) => PostContent::Post(post),
+            (None, Some(url)) => {
+                PostContent::parse_url(url).map_err(|err| ErrorUnprocessableEntity(err.body))?
+            }
+            _ => return Err(ErrorBadRequest("ONLY_EXACT_ONE_OF_POST_URL")),
         },
     };
     let output = super::Steps::from_ctx(&ctx).workflow(caller, input).await?;

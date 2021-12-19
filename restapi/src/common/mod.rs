@@ -63,21 +63,6 @@ pub enum PostContent {
     Url(url::Url),
 }
 
-#[derive(PartialEq, Eq, Clone)]
-pub struct PostInfo {
-    pub title: Title,
-    pub content: PostContent,
-}
-
-#[derive(PartialEq, Eq, Clone)]
-pub struct Post {
-    pub id: PostId,
-    pub creator: UserId,
-    pub creation: Time,
-    pub modified: Time,
-    pub info: PostInfo,
-}
-
 #[derive(PartialEq, Eq, Clone, Copy)]
 pub struct Size(u32);
 

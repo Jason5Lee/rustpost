@@ -14,21 +14,16 @@ pub struct Query {
     size: Size,
 }
 
-pub struct CreatorInfo {
-    pub name: UserName,
-    pub id: UserId,
-}
-
-pub struct PostInfoForIndex {
+pub struct PostInfo {
     pub id: PostId,
     pub title: Title,
-    pub creator: CreatorInfo,
+    pub creator: UserName,
     pub creation: Time,
 }
 
 pub struct Output {
-    pub last_page: bool,
-    pub posts: Vec<PostInfoForIndex>,
+    pub last_page: Option<bool>,
+    pub posts: Vec<PostInfo>,
 }
 define_steps! {
     async fn workflow(input: Query) -> Result<Output>;

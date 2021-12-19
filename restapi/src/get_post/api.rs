@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use crate::common::utils::Context;
-use actix_web::{error::ErrorUnprocessableEntity, get, web::Path as UrlPath, HttpResponse, Result};
+use actix_web::{get, web::Path as UrlPath, HttpResponse, Result};
 use apply::Apply;
 use serde::Serialize;
 
@@ -12,7 +12,7 @@ pub async fn api(mut ctx: Context) -> Result<HttpResponse> {
     let UrlPath((id,)) = ctx.to::<UrlPath<(String,)>>().await?;
     let input = utils::parse_id(&id)
         .map(PostId)
-        .map_err(|err| ErrorUnprocessableEntity(err.body))?;
+        .map_err(|_| error::post_not_found())?;
     let output = super::Steps::from_ctx(&ctx).workflow(input).await?;
 
     HttpResponse::Ok().json({

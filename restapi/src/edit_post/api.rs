@@ -9,7 +9,7 @@ use serde::Deserialize;
 // define_api!(post("/post"), UserOnly);
 #[post("/post/{id}")]
 pub async fn api(mut ctx: utils::Context) -> Result<HttpResponse> {
-    let caller = utils::auth::auth_user_only(&mut ctx)?;
+    let caller = utils::auth::auth_user_only(&ctx)?;
     #[derive(Deserialize)]
     #[allow(non_snake_case)]
     pub struct RequestDto {
@@ -21,7 +21,7 @@ pub async fn api(mut ctx: utils::Context) -> Result<HttpResponse> {
     let input = Command {
         id: PostId(
             utils::parse_id(&ctx.to::<UrlPath<(String,)>>().await?.0 .0)
-                .map_err(|err| ErrorUnprocessableEntity(err.body))?,
+                .map_err(|_| error::post_not_found())?,
         ),
         new_content: match (req.post, req.url) {
             (Some(post), None) => PostContent::Post(post),

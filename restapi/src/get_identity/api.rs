@@ -8,8 +8,8 @@ use serde::Serialize;
 use super::*;
 
 #[get("/identity")]
-pub async fn api(mut ctx: utils::Context) -> Result<HttpResponse> {
-    let caller = utils::auth::auth_optional(&mut ctx)?;
+pub async fn api(ctx: utils::Context) -> Result<HttpResponse> {
+    let caller = utils::auth::auth_optional(&ctx)?;
     let output = super::Steps::from_ctx(&ctx).workflow(caller).await?;
     HttpResponse::Ok()
         .json({

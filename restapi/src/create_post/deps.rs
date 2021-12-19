@@ -1,14 +1,14 @@
 use super::*;
 use crate::common::{utils::Deps, *};
 
-pub async fn store_post(deps: &Deps, creator: UserId, info: PostInfo) -> Result<PostId> {
+pub async fn store_post(deps: &Deps, creator: UserId, input: Command) -> Result<PostId> {
     let id = deps.id_gen.lock().real_time_generate() as u64;
-    let db::PostContent { post_type, content } = db::PostContent::from_model(info.content);
-    sqlx::query(&iformat!("INSERT INTO " db::POSTS "(" db::posts::POST_ID "," db::posts::CREATOR "," db::posts::CREATION_TIME_UTC "," db::posts::TITLE "," db::posts::POST_TYPE "," db::posts::CONTENT ") VALUES (?,?,?,?,?,?)"))
+    let db::PostContent { post_type, content } = db::PostContent::from_model(input.content);
+    sqlx::query(&iformat!("INSERT INTO `" db::POSTS "`(`" db::posts::POST_ID "`,`" db::posts::CREATOR "`,`" db::posts::CREATION_TIME_UTC "`,`" db::posts::TITLE "`,`" db::posts::POST_TYPE "`,`" db::posts::CONTENT "`) VALUES (?,?,?,?,?,?)"))
         .bind(id)
         .bind(creator.0)
         .bind(Time::now().utc)
-        .bind(info.title.as_str())
+        .bind(input.title.as_str())
         .bind(post_type)
         .bind(content)
         .execute(&deps.pool)

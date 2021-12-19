@@ -1,7 +1,7 @@
 use super::*;
 use crate::common::utils;
 use actix_web::Result;
-use actix_web::{error::ErrorUnprocessableEntity, post, web::Json as BodyJson, HttpResponse};
+use actix_web::{post, web::Json as BodyJson, HttpResponse};
 use serde::{Deserialize, Serialize};
 
 #[post("/login")]
@@ -15,9 +15,9 @@ pub async fn api(mut ctx: utils::Context) -> Result<HttpResponse> {
     let req_body = ctx.to::<BodyJson<RequestDto>>().await?.0;
     let input = Query {
         user_name: UserName::try_new(req_body.userName)
-            .map_err(|err| ErrorUnprocessableEntity(err.body))?,
+            .map_err(|_| error::user_name_or_password_incorrect())?,
         password: Password::from_plain(req_body.password)
-            .map_err(|err| ErrorUnprocessableEntity(err.body))?,
+            .map_err(|_| error::user_name_or_password_incorrect())?,
     };
     let output = super::Steps::from_ctx(&ctx).workflow(input).await?;
     Ok(HttpResponse::Ok().json({

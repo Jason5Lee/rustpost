@@ -31,17 +31,17 @@ pub async fn api(mut ctx: Context) -> Result<HttpResponse> {
         #[derive(Serialize)]
         #[allow(non_snake_case)]
         pub struct ResponseDto {
-            pub lastPage: bool,
-            pub info: Vec<PostInfoForPageDto>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            pub lastPage: Option<bool>,
+            pub info: Vec<PostInfoDto>,
         }
 
         #[derive(Serialize)]
         #[allow(non_snake_case)]
-        pub struct PostInfoForPageDto {
+        pub struct PostInfoDto {
             pub id: String,
             pub title: String,
             pub creatorName: Rc<str>,
-            pub creatorId: String,
             pub creationTime: u64,
         }
 
@@ -50,11 +50,10 @@ pub async fn api(mut ctx: Context) -> Result<HttpResponse> {
             info: output
                 .posts
                 .into_iter()
-                .map(|output| PostInfoForPageDto {
+                .map(|output| PostInfoDto {
                     id: utils::format_id(output.id.0),
                     title: output.title.into_string(),
-                    creatorName: output.creator.name.into_rc_str(),
-                    creatorId: utils::format_id(output.creator.id.0),
+                    creatorName: output.creator.into_rc_str(),
                     creationTime: output.creation.utc,
                 })
                 .collect::<Vec<_>>(),

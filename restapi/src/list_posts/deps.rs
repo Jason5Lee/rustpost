@@ -24,7 +24,7 @@ pub async fn workflow(deps: &Deps, Query { condition, size }: Query) -> Result<O
         .fetch_all(&deps.pool).await.map_err(utils::handle_internal)?;
 
     if posts_db_result.is_empty() {
-        return Ok(Output {last_page: true, posts: Vec::new()})
+        return Ok(Output {last_page: Some(true), posts: Vec::new()})
     }
     // Because sqlx doesn't support binding a slice for MySQL.
     // I have to manually make the query.
@@ -53,28 +53,25 @@ pub async fn workflow(deps: &Deps, Query { condition, size }: Query) -> Result<O
     let posts = posts_db_result
         .into_iter()
         .map(|(id, creator, creation_time_utc, title)| {
-            Ok(PostInfoForIndex {
+            Ok(PostInfo {
                 id: PostId(id),
                 title: Title::try_new(title).map_err(|err| err.log_then_internal_error())?,
-                creator: CreatorInfo {
-                    name: user_id_to_name
-                        .get(&creator)
-                        .ok_or_else(|| {
-                            log::error!("creator of post {}, {}, not found in users", id, creator);
-                            ErrorInternalServerError("")
-                        })?
-                        .clone(),
-                    id: UserId(creator),
-                },
+                creator: user_id_to_name
+                    .get(&creator)
+                    .ok_or_else(|| {
+                        log::error!("creator of post {}, {}, not found in users", id, creator);
+                        ErrorInternalServerError("")
+                    })?
+                    .clone(),
                 creation: Time {
                     utc: creation_time_utc,
                 },
             })
         })
-        .collect::<Result<Vec<PostInfoForIndex>>>()?;
+        .collect::<Result<Vec<PostInfo>>>()?;
 
     Ok(Output {
-        last_page: posts.len() < size.to_u32() as usize,
+        last_page: if posts.len() < size.to_u32() as usize { Some(true) } else { None },
         posts,
     })
 }
