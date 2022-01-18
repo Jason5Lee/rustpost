@@ -7,10 +7,10 @@ use std::{collections::HashMap, io::Write};
 pub async fn workflow(deps: &Deps, Query { condition, size }: Query) -> Result<Output> {
     // For convenient I don't use binding for time range.
     // I hope it won't cause injection
-    let post_condition_sql = match condition {
-        Condition::No => String::new(),
-        Condition::Before(before) => iformat!("WHERE " db::posts::CREATION_TIME_UTC " < " before.utc),
-        Condition::After(after) => iformat!("WHERE " db::posts::CREATION_TIME_UTC " > " after.utc),
+    let (post_condition_sql, order) = match condition {
+        Condition::No => (String::new(), "DESC"),
+        Condition::Before(before) => (iformat!("WHERE " db::posts::CREATION_TIME_UTC " < " before.utc), "DESC"),
+        Condition::After(after) => (iformat!("WHERE " db::posts::CREATION_TIME_UTC " > " after.utc), "ASC"),
     };
     let post_sql = iformat!(
         "SELECT " db::posts::POST_ID
@@ -18,7 +18,7 @@ pub async fn workflow(deps: &Deps, Query { condition, size }: Query) -> Result<O
         "," db::posts::CREATION_TIME_UTC
         "," db::posts::TITLE
         " FROM " db::POSTS " " post_condition_sql
-        " ORDER BY " db::posts::CREATION_TIME_UTC " DESC LIMIT ?"
+        " ORDER BY " db::posts::CREATION_TIME_UTC " " order " LIMIT ?"
     );
     let posts_db_result: Vec<(u64, u64, u64, String)> = sqlx::query_as(&post_sql).bind(size.to_u32())
         .fetch_all(&deps.pool).await.map_err(utils::handle_internal)?;
