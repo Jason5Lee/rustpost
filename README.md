@@ -1,5 +1,7 @@
 # Rustpost
 
+**Note: this project has been moved to [here](https://github.com/Jason5Lee/post-project/tree/main/backend/services/post-rust-actix-web-fdm).**
+
 The REST service that allows users to create, view and manage posts.
 
 ## Projects
